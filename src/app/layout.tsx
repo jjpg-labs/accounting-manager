@@ -14,8 +14,8 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<html lang="en">
-			<body>
+		<html lang="en" className="h-full bg-white">
+			<body className="h-full">
 				<Nav />
 				<div className="container mx-auto px-4 sm:px-6 lg:px-8">
 					{children}

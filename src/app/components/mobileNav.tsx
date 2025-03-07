@@ -3,7 +3,7 @@ import Image from "next/image";
 
 type NavProps = {
 	navigation: { name: string, href: string }[],
-	user?: { name: string, email: string, imageUrl: string },
+	user: { name: string, email: string, imageUrl: string } | null,
 	userNavigation: { name: string, href: string }[]
 }
 

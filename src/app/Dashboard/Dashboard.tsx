@@ -24,24 +24,21 @@ export default function Dashboard() {
 		}
 	]
 	return <main className="flex flex-col sm:flex-row flex-wrap pt-10">
-		<section className="w-1/2 pb-10">
+		<section className="w-full sm:w-1/2 pb-10">
 			<BarChart
 				dataset={data}
-				xAxis={[{ scaleType: 'band', dataKey: 'date'}]}
+				xAxis={[{ scaleType: 'band', dataKey: 'date' }]}
 				series={[
-					{dataKey: 'income', label: 'Income'},
-					{dataKey: 'outcome', label: 'Outcome'},
-					{dataKey: 'balance', label: 'Balance'}
+					{ dataKey: 'income', label: 'Income' },
+					{ dataKey: 'outcome', label: 'Outcome' },
+					{ dataKey: 'balance', label: 'Balance' }
 				]}
 				width={500}
 				height={500}
 			/>
 		</section>
-		<section className="w-1/2 pb-10">
-			Year balance per months
-		</section>
-		<section className="grow w-1/2 pb-10">
-			Last rows added
+		<section className="w-full sm:w-1/2 pb-10">
+			Daily balance form
 		</section>
 	</main>
 }
