@@ -16,7 +16,7 @@ export default function Login() {
 		</div>
 
 		<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-			<form method="POST" className="space-y-6" action={action}>
+			<form className="space-y-6" action={action}>
 				<div>
 					<label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
 						Email address
@@ -68,13 +68,6 @@ export default function Login() {
 					</button>
 				</div>
 			</form>
-
-			<p className="mt-10 text-center text-sm/6 text-gray-500">
-				Not a member?{' '}
-				<a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-					Start a 14 day free trial
-				</a>
-			</p>
 		</div>
 	</main>
 }

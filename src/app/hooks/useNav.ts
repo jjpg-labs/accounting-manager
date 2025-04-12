@@ -1,4 +1,27 @@
-export default function useNav() {
+type User = {
+	name: string
+	email: string
+	imageUrl: string
+} | null
+
+type BaseNavigationItem = {
+	name: string
+	href: string
+}
+
+type NavigationItem = BaseNavigationItem & {
+	current: boolean
+}
+
+type UseNavResult = {
+	navigation: NavigationItem[]
+	user: User
+	userNavigation: BaseNavigationItem[]
+	imageUrl: string
+
+}
+
+export default function useNav(): UseNavResult {
 	const navigation = [
 		{ name: 'Home', href: '/', current: true },
 		{ name: 'About', href: '/about', current: false },
@@ -6,7 +29,7 @@ export default function useNav() {
 		{ name: 'Contact', href: '/contact', current: false },
 	]
 
-	const user = null /*{
+	const user: User = null /*{
 		name: 'Tom Cook',
 		email: 'tom@example.com',
 		imageUrl:

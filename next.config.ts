@@ -7,12 +7,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'tailwindui.com',
-        pathname: '/plus/img/logos/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'tailwindui.com',
-        pathname: '/plus-assets/img/logos/**',
+        pathname: '/**',
       },
       {
         protocol: 'https',
