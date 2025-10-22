@@ -1,19 +1,26 @@
-import nextJest from "next/jest";
+import nextJest from 'next/jest';
 
 const createJestConfig = nextJest({
-  dir: "./",
+  dir: './',
 });
 
 const customJestConfig = {
-  testEnvironment: "jsdom",
+  testEnvironment: 'jsdom',
   clearMocks: true,
   collectCoverage: true,
-  coverageDirectory: "coverage",
+  coverageDirectory: 'coverage',
 
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // 👈 añade esta línea
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
+  collectCoverageFrom: [
+    'src/app/**/*.{js,jsx,ts,tsx}', // Check all JS/TS/JSX/TSX files under src/app
+    '!src/app/**/layout.tsx', // Optional: Exclude files that are difficult/unnecessary to test
+    '!src/app/**/globals.css', // Optional: Exclude CSS files
+    '!src/app/**/route.ts', // Optional: Exclude API routes
+    '!**/*.d.ts', // Standard: Exclude TypeScript definition files
+  ],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
 };
 
@@ -24,7 +31,7 @@ const asyncConfig = async () => {
     ...nextJsConfig,
     moduleNameMapper: {
       ...nextJsConfig.moduleNameMapper,
-      "^@/(.*)$": "<rootDir>/src/$1",
+      '^@/(.*)$': '<rootDir>/src/$1',
     },
   };
 };

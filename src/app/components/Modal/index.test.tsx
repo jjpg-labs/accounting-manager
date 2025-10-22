@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Modal } from './';
+import { Modal } from '.';
 
 describe('Modal', () => {
   it('should not call onClose when clicking inside the modal content', () => {

@@ -1,6 +1,6 @@
-import { Form } from "@/app/components/form";
-import { Modal } from "@/app/components/modal";
-import React, { forwardRef, useRef, useState } from "react";
+import { Form } from '@/app/components/Form';
+import { Modal } from '@/app/components/Modal';
+import React, { forwardRef, useRef, useState } from 'react';
 
 interface DiaryModalProps {
   isModalOpen: boolean;
@@ -13,7 +13,7 @@ interface NumericInputProps {
   testId: string;
 }
 
-const INPUT_CLASSES = "border rounded-md p-2";
+const INPUT_CLASSES = 'border rounded-md p-2';
 
 export const NumericInput = forwardRef<HTMLInputElement, NumericInputProps>(
   ({ placeholder, onChange, testId }, ref) => {
@@ -45,9 +45,9 @@ export const DiaryModal = ({
   };
 
   const handleNetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cashValue = parseFloat(cashRef.current?.value || "0");
-    const creditCardValue = parseFloat(creditCardRef.current?.value || "0");
-    const expensesValue = parseFloat(expensesRef.current?.value || "0");
+    const cashValue = parseFloat(cashRef.current?.value || '0');
+    const creditCardValue = parseFloat(creditCardRef.current?.value || '0');
+    const expensesValue = parseFloat(expensesRef.current?.value || '0');
     const netTotal = cashValue + creditCardValue - expensesValue;
     setTotalNet(netTotal);
   };

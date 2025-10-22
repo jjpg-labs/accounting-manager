@@ -2,10 +2,10 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DiaryModal, NumericInput } from './index';
-import { Modal, ModalProps } from '@/app/components/modal';
-import { FormProps } from '@/app/components/form';
+import { Modal, ModalProps } from '@/app/components/Modal';
+import { FormProps } from '@/app/components/Form';
 
-jest.mock('@/app/components/modal', () => ({
+jest.mock('@/app/components/Modal', () => ({
   Modal: ({ children, onClose, title, isModalOpen }: ModalProps) => {
     if (!isModalOpen) return null;
 
@@ -21,7 +21,7 @@ jest.mock('@/app/components/modal', () => ({
   },
 }));
 
-jest.mock('@/app/components/form', () => ({
+jest.mock('@/app/components/Form', () => ({
   Form: ({ isModalOpen, handleCloseModal, title, children }: FormProps) => {
     if (!isModalOpen) return null;
 
