@@ -1,6 +1,8 @@
 import { Form } from '@/app/components/Form';
 import { INPUT_CLASSES } from '@/app/Dashboard/components/diaryModal';
+import { setUser } from '@/features/user/userSlice';
 import React from 'react';
+import { useDispatch } from 'react-redux';
 
 interface LoginModalProps {
   isModalOpen: boolean;
@@ -13,6 +15,7 @@ export const LoginModal = ({
 }: LoginModalProps) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const dispatch = useDispatch();
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -34,13 +37,15 @@ export const LoginModal = ({
       }),
     })
       .then((response) => {
-        response.json().then(() => {
-          if (!response.ok) {
-            throw new Error('Login failed');
-          }
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
 
-          console.log('Successful login.');
-        });
+        return response.json();
+      })
+      .then((data) => {
+        dispatch(setUser(data.user));
+        handleCloseModal();
       })
       .catch((error) => {
         console.log('Login error:', error);

@@ -1,8 +1,10 @@
+import { cookies } from 'next/headers';
 import ApiClient from '../../api';
 
-const apiClient = new ApiClient();
-
 export async function POST(request: Request) {
+  const cookieStore = await cookies();
+  const apiClient = new ApiClient(cookieStore);
+
   try {
     const { name, userId } = await request.json();
 

@@ -4,10 +4,12 @@ import { NextResponse } from 'next/server';
 import ApiClient from '../../api';
 import { cookies } from 'next/headers';
 import { setAccessTokens } from '@/app/lib/helpers/auth';
+import { UserData } from '@/features/user/userSlice';
 
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
+  user: UserData;
 }
 
 export async function POST(request: Request) {

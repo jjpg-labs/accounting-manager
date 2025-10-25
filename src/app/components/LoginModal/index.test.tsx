@@ -27,6 +27,11 @@ jest.mock('@/app/components/Form', () => ({
   ),
 }));
 
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useDispatch: () => jest.fn(),
+}));
+
 global.fetch = jest.fn();
 
 describe('LoginModal', () => {
@@ -74,5 +79,64 @@ describe('LoginModal', () => {
     });
 
     consoleLogSpy.mockRestore();
+  });
+
+  describe('submit handling', () => {
+    it('handles successful login', async () => {
+      const mockUser = { id: '1', email: 'test@example.com' };
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ user: mockUser }),
+      });
+
+      const setIsModalOpen = jest.fn();
+
+      render(<LoginModal isModalOpen={true} setIsModalOpen={setIsModalOpen} />);
+
+      fireEvent.submit(
+        screen.getByRole('button', { name: 'Submit' }).closest('form')!
+      );
+
+      await waitFor(() => {
+        expect(setIsModalOpen).toHaveBeenCalledWith(false);
+      });
+    });
+
+    it('handles failed login', async () => {
+      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+      });
+
+      render(<LoginModal isModalOpen={true} setIsModalOpen={jest.fn()} />);
+
+      fireEvent.submit(
+        screen.getByRole('button', { name: 'Submit' }).closest('form')!
+      );
+
+      await waitFor(() => {
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+          'Login error:',
+          expect.any(Error)
+        );
+      });
+
+      consoleLogSpy.mockRestore();
+    });
+  });
+
+  describe('input handling', () => {
+    it('updates email and password state on input change', () => {
+      render(<LoginModal isModalOpen={true} setIsModalOpen={jest.fn()} />);
+
+      const emailInput = screen.getByPlaceholderText('Email');
+      const passwordInput = screen.getByPlaceholderText('Password');
+
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      fireEvent.change(passwordInput, { target: { value: 'password' } });
+
+      expect(emailInput).toHaveValue('test@example.com');
+      expect(passwordInput).toHaveValue('password');
+    });
   });
 });

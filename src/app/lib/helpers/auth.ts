@@ -5,11 +5,7 @@ export async function setAccessTokens(
   refreshToken: string
 ) {
   const cookieStore = await cookies();
-  console.log('Setting auth tokens in cookies:', {
-    accessToken,
-    refreshToken,
-    processEnv: process.env.NODE_ENV,
-  });
+
   cookieStore.set('accessToken', accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
