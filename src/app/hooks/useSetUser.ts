@@ -16,8 +16,7 @@ export const useSetUser = () => {
       .then((data) => {
         dispatch(setUser(data));
       })
-      .catch((error) => {
-        console.error('User initialization failed:', error);
+      .catch(() => {
         dispatch(setInitializationFailed());
       });
   }, [dispatch]);

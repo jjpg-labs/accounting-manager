@@ -14,7 +14,7 @@ export default function Dashboard() {
 
   return (
     <main>
-      {isUserLoggedIn && (
+      {isUserLoggedIn ? (
         <>
           <div className="pt-16 overflow-hidden isolate relative">
             <header className="pt-6 sm:pb-6 pb-4">
@@ -111,6 +111,10 @@ export default function Dashboard() {
             setIsModalOpen={setIsDiaryModalOpen}
           />
         </>
+      ) : (
+        <div className="pt-20 text-center text-gray-500">
+          Por favor, inicie sesión para ver su panel de control.
+        </div>
       )}
     </main>
   );
