@@ -1,148 +1,139 @@
 import React from 'react';
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { DiaryModal, NumericInput } from './index';
-import { Modal, ModalProps } from '@/app/components/Modal';
-import { FormProps } from '@/app/components/Form';
-
-jest.mock('@/app/components/Modal', () => ({
-  Modal: ({ children, onClose, title, isModalOpen }: ModalProps) => {
-    if (!isModalOpen) return null;
-
-    return (
-      <div data-testid="mock-modal">
-        <h1>{title}</h1>
-        <button onClick={onClose} data-testid="mock-close-button">
-          Close Mock
-        </button>
-        {children}
-      </div>
-    );
-  },
-}));
-
-jest.mock('@/app/components/Form', () => ({
-  Form: ({ isModalOpen, handleCloseModal, title, children }: FormProps) => {
-    if (!isModalOpen) return null;
-
-    return (
-      <Modal isModalOpen={isModalOpen} onClose={handleCloseModal} title={title}>
-        <form>{children}</form>
-      </Modal>
-    );
-  },
-}));
+import { render, fireEvent, screen } from '@testing-library/react';
+import { DiaryModal } from './index';
 
 describe('DiaryModal', () => {
-  const mockSetIsModalOpen = jest.fn();
-  const defaultProps = {
-    isModalOpen: true,
-    setIsModalOpen: mockSetIsModalOpen,
+  let consoleErrorSpy: jest.SpyInstance;
+
+  const setup = (isModalOpen = true, setIsModalOpen = jest.fn()) => {
+    render(
+      <DiaryModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+    );
+    return { setIsModalOpen };
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  const getInputs = () => ({
-    liquid: screen.getByTestId('cash-input') as HTMLInputElement,
-    creditCard: screen.getByTestId('credit-card-input') as HTMLInputElement,
-    expenses: screen.getByTestId('expenses-input') as HTMLInputElement,
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
-  const getTotalInput = () =>
-    screen.getByTestId('total-input') as HTMLInputElement;
-
-  it('should render the modal with all four inputs when it is open', () => {
-    render(<DiaryModal {...defaultProps} />);
-
-    expect(screen.getByTestId('mock-modal')).toBeInTheDocument();
-
-    const { liquid, creditCard, expenses } = getInputs();
-    expect(liquid).toBeInTheDocument();
-    expect(creditCard).toBeInTheDocument();
-    expect(expenses).toBeInTheDocument();
-    expect(getTotalInput()).toBeInTheDocument();
+  it('renders all numeric inputs and total', () => {
+    setup();
+    expect(screen.getByTestId('cash-input')).toBeInTheDocument();
+    expect(screen.getByTestId('credit-card-input')).toBeInTheDocument();
+    expect(screen.getByTestId('expenses-input')).toBeInTheDocument();
+    expect(screen.getByTestId('total-input')).toBeInTheDocument();
   });
 
-  it('should call setIsModalOpen(false) when the modal is closed', () => {
-    render(<DiaryModal {...defaultProps} />);
-
-    const closeButton = screen.getByTestId('mock-close-button');
-    fireEvent.click(closeButton);
-
-    expect(mockSetIsModalOpen).toHaveBeenCalledWith(false);
-  });
-
-  it('should correctly calculate the total net value', () => {
-    render(
-      <DiaryModal isModalOpen={true} setIsModalOpen={mockSetIsModalOpen} />
+  it('updates cash input and reflects in total', () => {
+    setup();
+    const cashInput = screen.getByTestId('cash-input') as HTMLInputElement;
+    fireEvent.change(cashInput, { target: { value: '100' } });
+    expect(cashInput.value).toBe('100');
+    expect((screen.getByTestId('total-input') as HTMLInputElement).value).toBe(
+      '100'
     );
+  });
 
-    const cashInput = screen.getByTestId('cash-input');
-    const creditCardInput = screen.getByTestId('credit-card-input');
-    const expensesInput = screen.getByTestId('expenses-input');
-    const totalInput = screen.getByTestId('total-input');
+  it('updates credit card input and reflects in total', () => {
+    setup();
+    const creditCardInput = screen.getByTestId(
+      'credit-card-input'
+    ) as HTMLInputElement;
+    fireEvent.change(creditCardInput, { target: { value: '50' } });
+    expect(creditCardInput.value).toBe('50');
+    expect((screen.getByTestId('total-input') as HTMLInputElement).value).toBe(
+      '50'
+    );
+  });
+
+  it('updates expenses input and reflects in total', () => {
+    setup();
+    const cashInput = screen.getByTestId('cash-input') as HTMLInputElement;
+    const creditCardInput = screen.getByTestId(
+      'credit-card-input'
+    ) as HTMLInputElement;
+    const expensesInput = screen.getByTestId(
+      'expenses-input'
+    ) as HTMLInputElement;
 
     fireEvent.change(cashInput, { target: { value: '100' } });
     fireEvent.change(creditCardInput, { target: { value: '50' } });
     fireEvent.change(expensesInput, { target: { value: '30' } });
 
-    expect(totalInput).toHaveValue('120');
-  });
-
-  it('should reset total net value when modal is closed', () => {
-    const { rerender } = render(
-      <DiaryModal isModalOpen={true} setIsModalOpen={mockSetIsModalOpen} />
+    expect(expensesInput.value).toBe('30');
+    expect((screen.getByTestId('total-input') as HTMLInputElement).value).toBe(
+      '120'
     );
+  });
 
-    const cashInput = screen.getByTestId('cash-input');
-    const creditCardInput = screen.getByTestId('credit-card-input');
-    const expensesInput = screen.getByTestId('expenses-input');
-    const totalInput = screen.getByTestId('total-input');
-    fireEvent.change(cashInput, { target: { value: '200' } });
-    fireEvent.change(creditCardInput, { target: { value: '100' } });
-    fireEvent.change(expensesInput, { target: { value: '50' } });
+  it('resets values and closes modal on handleCloseModal', () => {
+    const setIsModalOpen = jest.fn();
+    setup(true, setIsModalOpen);
 
-    expect(totalInput).toHaveValue('250');
-    const closeButton = screen.getByTestId('mock-close-button');
-    fireEvent.click(closeButton);
+    const cashInput = screen.getByTestId('cash-input') as HTMLInputElement;
+    const creditCardInput = screen.getByTestId(
+      'credit-card-input'
+    ) as HTMLInputElement;
+    const expensesInput = screen.getByTestId(
+      'expenses-input'
+    ) as HTMLInputElement;
 
-    rerender(
-      <DiaryModal isModalOpen={true} setIsModalOpen={mockSetIsModalOpen} />
+    fireEvent.change(cashInput, { target: { value: '100' } });
+    fireEvent.change(creditCardInput, { target: { value: '50' } });
+    fireEvent.change(expensesInput, { target: { value: '30' } });
+
+    const cancelButton = screen.getByRole('button', { name: /cancelar/i });
+    fireEvent.click(cancelButton);
+
+    expect(setIsModalOpen).toHaveBeenCalledWith(false);
+
+    expect(cashInput.value).toBe('');
+    expect(creditCardInput.value).toBe('');
+    expect(expensesInput.value).toBe('');
+    expect((screen.getByTestId('total-input') as HTMLInputElement).value).toBe(
+      '0'
     );
-    expect(getTotalInput()).toHaveValue('0');
   });
 
-  it('should treat empty cash input as 0 when calculating total', () => {
-    render(<DiaryModal isModalOpen={true} setIsModalOpen={jest.fn()} />);
+  it('handles empty or non-numeric input by setting value to 0 and updating total', () => {
+    setup();
+    const cashInput = screen.getByTestId('cash-input') as HTMLInputElement;
+    const creditCardInput = screen.getByTestId(
+      'credit-card-input'
+    ) as HTMLInputElement;
+    const expensesInput = screen.getByTestId(
+      'expenses-input'
+    ) as HTMLInputElement;
+    const totalInput = screen.getByTestId('total-input') as HTMLInputElement;
 
-    const creditCardInput = screen.getByTestId('credit-card-input');
-    const expensesInput = screen.getByTestId('expenses-input');
-    const totalInput = screen.getByTestId('total-input');
+    fireEvent.change(cashInput, { target: { value: '100' } });
+    fireEvent.change(creditCardInput, { target: { value: '50' } });
+    fireEvent.change(expensesInput, { target: { value: '30' } });
+    expect(totalInput.value).toBe('120');
 
-    fireEvent.change(creditCardInput, { target: { value: '100' } });
-    fireEvent.change(expensesInput, { target: { value: '40' } });
+    fireEvent.change(cashInput, { target: { value: '' } });
 
-    expect(totalInput).toHaveValue('60');
+    expect(totalInput.value).toBe('20');
+
+    fireEvent.change(creditCardInput, { target: { value: 'invalid' } });
+
+    expect(totalInput.value).toBe('-30');
   });
 
-  describe('NumericInput', () => {
-    it('renders correctly and calls onChange', () => {
-      const handleChange = jest.fn();
-      render(
-        <NumericInput
-          placeholder="Test input"
-          onChange={handleChange}
-          testId="test"
-          ref={null}
-        />
-      );
-
-      const input = screen.getByTestId('test-input') as HTMLInputElement;
-      expect(input).toBeInTheDocument();
-      fireEvent.change(input, { target: { value: '42' } });
-      expect(handleChange).toHaveBeenCalledTimes(1);
-    });
+  it('shows empty string for zero values in inputs', () => {
+    setup();
+    expect((screen.getByTestId('cash-input') as HTMLInputElement).value).toBe(
+      ''
+    );
+    expect(
+      (screen.getByTestId('credit-card-input') as HTMLInputElement).value
+    ).toBe('');
+    expect(
+      (screen.getByTestId('expenses-input') as HTMLInputElement).value
+    ).toBe('');
   });
 });

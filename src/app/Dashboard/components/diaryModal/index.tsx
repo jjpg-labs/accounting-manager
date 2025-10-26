@@ -1,21 +1,22 @@
 import { Form } from '@/app/components/Form';
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useState } from 'react';
+
+interface NumericInputProps {
+  placeholder: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  testId: string;
+  value: number; // Añadido para input controlado
+}
 
 interface DiaryModalProps {
   isModalOpen: boolean;
   setIsModalOpen: (isOpen: boolean) => void;
 }
 
-interface NumericInputProps {
-  placeholder: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  testId: string;
-}
-
 export const INPUT_CLASSES = 'border rounded-md p-2';
 
 export const NumericInput = forwardRef<HTMLInputElement, NumericInputProps>(
-  ({ placeholder, onChange, testId }, ref) => {
+  ({ placeholder, onChange, testId, value }, ref) => {
     return (
       <input
         type="number"
@@ -24,6 +25,7 @@ export const NumericInput = forwardRef<HTMLInputElement, NumericInputProps>(
         onChange={onChange}
         ref={ref}
         data-testid={`${testId}-input`}
+        value={value === 0 ? '' : value}
       />
     );
   }
@@ -33,23 +35,25 @@ export const DiaryModal = ({
   isModalOpen,
   setIsModalOpen,
 }: DiaryModalProps) => {
-  const [totalNet, setTotalNet] = useState(0);
-  const cashRef = useRef<HTMLInputElement>(null);
-  const creditCardRef = useRef<HTMLInputElement>(null);
-  const expensesRef = useRef<HTMLInputElement>(null);
+  const [cash, setCash] = useState(0);
+  const [creditCard, setCreditCard] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+
+  const totalNet = cash + creditCard - expenses;
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setTotalNet(0);
+    setCash(0);
+    setCreditCard(0);
+    setExpenses(0);
   };
 
-  const handleNetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cashValue = parseFloat(cashRef.current?.value || '0');
-    const creditCardValue = parseFloat(creditCardRef.current?.value || '0');
-    const expensesValue = parseFloat(expensesRef.current?.value || '0');
-    const netTotal = cashValue + creditCardValue - expensesValue;
-    setTotalNet(netTotal);
-  };
+  const handleInputChange =
+    (setter: React.Dispatch<React.SetStateAction<number>>) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(e.target.value) || 0;
+      setter(value);
+    };
 
   return (
     <Form
@@ -60,20 +64,20 @@ export const DiaryModal = ({
     >
       <NumericInput
         placeholder="Efectivo"
-        onChange={handleNetChange}
-        ref={cashRef}
+        onChange={handleInputChange(setCash)}
+        value={cash}
         testId="cash"
       />
       <NumericInput
         placeholder="Tarjeta"
-        onChange={handleNetChange}
-        ref={creditCardRef}
+        onChange={handleInputChange(setCreditCard)}
+        value={creditCard}
         testId="credit-card"
       />
       <NumericInput
         placeholder="Gastos"
-        onChange={handleNetChange}
-        ref={expensesRef}
+        onChange={handleInputChange(setExpenses)}
+        value={expenses}
         testId="expenses"
       />
       <input
