@@ -15,7 +15,6 @@ updates:
     labels:
       - "dependencies"
       - "dependabot"
-    security-updates-only: false
     target-branch: "main"
 
   - package-ecosystem: "github-actions"
@@ -30,5 +29,4 @@ updates:
     labels:
       - "dependencies"
       - "dependabot"
-    security-updates-only: false
     target-branch: "main"
